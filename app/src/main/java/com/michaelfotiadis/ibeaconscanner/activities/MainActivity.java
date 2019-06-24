@@ -19,12 +19,6 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnChildClickListener;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.anthonycr.grant.PermissionsManager;
 import com.anthonycr.grant.PermissionsResultAction;
 import com.github.johnpersano.supertoasts.library.SuperActivityToast;
@@ -42,7 +36,6 @@ import com.michaelfotiadis.ibeaconscanner.utils.ToastUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class MainActivity extends BaseActivity implements OnChildClickListener, OnCheckedChangeListener {
 
@@ -61,8 +54,6 @@ public class MainActivity extends BaseActivity implements OnChildClickListener, 
     private boolean mIsScanRunning = false;
     private boolean mIsToastScanningNowShown;
     private boolean mIsToastStoppingScanShown;
-
-    public String url;
 
     @Override
     public void onCheckedChanged(final CompoundButton buttonView, final boolean isChecked) {
@@ -299,14 +290,10 @@ public class MainActivity extends BaseActivity implements OnChildClickListener, 
                 if (Singleton.getInstance().getAvailableDevicesList() != null) {
                     Log.i("tes erda : ", "masuk sini");
                     updateListData();
-
-
                 }
             }
         });
     }
-
-
 
     private void registerMonitorTask() {
         Logger.d(TAG, "Starting Monitor Task");
