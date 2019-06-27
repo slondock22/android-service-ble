@@ -40,7 +40,7 @@ public class DeviceActivity extends BaseActivity {
 
         final BluetoothLeDevice device = getIntent().getParcelableExtra(CustomConstants.Payloads.PAYLOAD_1.toString());
 
-        setTitle(device.getName());
+        setTitle("tes");
 
         final ListView listView = (ListView) findViewById(R.id.list_view);
 

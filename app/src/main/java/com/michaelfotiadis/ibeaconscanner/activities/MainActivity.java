@@ -19,6 +19,12 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnChildClickListener;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.anthonycr.grant.PermissionsManager;
 import com.anthonycr.grant.PermissionsResultAction;
 import com.github.johnpersano.supertoasts.library.SuperActivityToast;
@@ -36,6 +42,12 @@ import com.michaelfotiadis.ibeaconscanner.utils.ToastUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import uk.co.alt236.bluetoothlelib.device.BluetoothLeDevice;
+import uk.co.alt236.bluetoothlelib.device.beacon.BeaconType;
+import uk.co.alt236.bluetoothlelib.device.beacon.BeaconUtils;
+import uk.co.alt236.bluetoothlelib.device.beacon.ibeacon.IBeaconManufacturerData;
 
 public class MainActivity extends BaseActivity implements OnChildClickListener, OnCheckedChangeListener {
 
@@ -143,6 +155,7 @@ public class MainActivity extends BaseActivity implements OnChildClickListener, 
 
         // monitor the singleton
         registerMonitorTask();
+
 
         // Wait for broadcasts from the scanning process
         registerResponseReceiver();
@@ -288,11 +301,61 @@ public class MainActivity extends BaseActivity implements OnChildClickListener, 
             @Override
             public void run() {
                 if (Singleton.getInstance().getAvailableDevicesList() != null) {
+
+
                     Log.i("tes erda : ", "masuk sini");
                     updateListData();
+                    for (int i = 0; i < Singleton.getInstance().getDevicesAvailableAsStringList().size();i++) {
+                        BluetoothLeDevice device = Singleton.getInstance().getBluetoothLeDeviceForAddress(Singleton.getInstance().getDevicesAvailableAsStringList().get(i));
+                        Log.i("device ke",   device.toString());
+                        if (BeaconUtils.getBeaconType(device) == BeaconType.IBEACON) {
+                            final IBeaconManufacturerData iBeaconData = new IBeaconManufacturerData(device);
+                            Log.i("uuid",iBeaconData.getUUID());
+                            //api
+                            hitAPI(iBeaconData.getUUID());
+                        }
+                    }
+
+
                 }
             }
         });
+    }
+
+    public void hitAPI(final String uuid) {
+
+        RequestQueue queue = Volley.newRequestQueue(this);  // this = context
+        String url = "https://trade2gov.com/bleuid";
+        StringRequest postRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>()
+                {
+                    @Override
+                    public void onResponse(String response) {
+                        // response
+                        Log.d("Response", response);
+                        Log.d("Response uuid", uuid);
+                    }
+                },
+                new Response.ErrorListener()
+                {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // error
+                        Log.d("Error.Response", error.getStackTrace().toString());
+                    }
+                }
+        ) {
+            @Override
+            protected Map<String, String> getParams()
+            {
+                Map<String, String>  params = new HashMap<String, String>();
+                params.put("UID", uuid);
+//                params.put("QR_CODE", "JDJ5JDEwJGJ2UzdXTFBIYjlEeE5TZ1FhNjd3WWVjVm9DdHBOZ3NkcFNpdHViRWE1aGxnV01qY1l2WWp5fHxZV2x5YkdGdVoyZGhMbkJoYzIxcGEyRkFaV1JwTFdsdVpHOXVaWE5wWVM1amJ5NXBaQT09fHxlZGlpY211c2Vy");
+
+                return params;
+            }
+        };
+        queue.add(postRequest);
     }
 
     private void registerMonitorTask() {
@@ -326,6 +389,7 @@ public class MainActivity extends BaseActivity implements OnChildClickListener, 
     private void updateListData() {
 
         Logger.d(TAG, "Updating List Data");
+        Log.i("tes : ", Singleton.getInstance().getDevicesAvailableAsStringList().toString());
         mListDataHeader = new ArrayList<>();
         mListDataHeader.add("Available Devices (" + Singleton.getInstance().getAvailableDeviceListSize() + ")");
         mListDataHeader.add("New Devices (" + Singleton.getInstance().getNewDeviceListSize() + ")");
