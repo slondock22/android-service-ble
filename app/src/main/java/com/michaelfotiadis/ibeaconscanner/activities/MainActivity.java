@@ -311,8 +311,15 @@ public class MainActivity extends BaseActivity implements OnChildClickListener, 
                         if (BeaconUtils.getBeaconType(device) == BeaconType.IBEACON) {
                             final IBeaconManufacturerData iBeaconData = new IBeaconManufacturerData(device);
                             Log.i("uuid",iBeaconData.getUUID());
+                            Log.i("last RSSI nya adalah",String.valueOf(device.getRssi()));
                             //api
-                            hitAPI(iBeaconData.getUUID());
+                            if(device.getRssi() >= -50){
+                                Log.d("manteep boy","ini kurang dari -50an");
+                                hitAPI(iBeaconData.getUUID());
+                            }else {
+                                Log.d("lebiih boy","ini lebih dari -50an");
+                                hitAPI(String.valueOf(0));
+                            }
                         }
                     }
 
